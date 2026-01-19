@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Gestión de Categorías{% endblock %}
+{% block breadcrumb %}Categorías{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-info">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Categorías (Menús)</h3>
+        <div class="card-tools">
+            <a href="{% url 'categoria_create' %}" class="btn btn-sm btn-info">
+                <i class="fas fa-plus"></i> Nueva Categoría
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Icono</th>
+                    <th>Orden</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in categorias %}
+                <tr>
+                    <td>{{ cat.nombre }}</td>
+                    <td><i class="{{ cat.icono }}"></i> {{ cat.icono }}</td>
+                    <td>{{ cat.orden }}</td>
+                    <td>
+                        {% if cat.activo %}
+                        <span class="badge badge-success">Activo</span>
+                        {% else %}
+                        <span class="badge badge-danger">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'categoria_update' pk=cat.pk %}" class="btn btn-sm btn-info"><i
+                                class="fas fa-edit"></i></a>
+                        <form action="{% url 'categoria_delete' pk=cat.pk %}" method="POST" class="d-inline"
+                            onsubmit="return confirm('¿Eliminar?');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Sin resultados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

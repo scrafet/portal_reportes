@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ action }} Reporte{% endblock %}
+{% block breadcrumb %}{{ action }} Reporte{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Datos del Reporte</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ reporte.nombre|default:'' }}" required>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        <label for="descripcion">Descripción</label>
+                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3">{{ reporte.descripcion|default:'' }}</textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="categoria">Categoría</label>
+                        <select class="form-control" id="categoria" name="categoria" required>
+                            {% for cat in categorias %}
+                            <option value="{{ cat.id }}" {% if reporte.categoria_id == cat.id %}selected{% endif %}>{{ cat.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="sp_nombre">Nombre Stored Procedure</label>
+                        <input type="text" class="form-control" id="sp_nombre" name="sp_nombre" value="{{ reporte.sp_nombre|default:'' }}" required>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="activo" name="activo" {% if not reporte or reporte.activo %}checked{% endif %}>
+                        <label class="form-check-label" for="activo">Activo</label>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="{% url 'reporte_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

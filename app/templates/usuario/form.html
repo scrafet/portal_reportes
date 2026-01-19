@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ action }} Usuario{% endblock %}
+{% block breadcrumb %}{{ action }} Usuario{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Datos de Usuario</h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="form-group mb-3">
+                        <label>Username</label>
+                        <input type="text" class="form-control" name="username"
+                            value="{{ usuario.username|default:'' }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Email</label>
+                        <input type="email" class="form-control" name="email" value="{{ usuario.email|default:'' }}">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Password {% if action == 'Editar' %}(Dejar en blanco para no cambiar){% endif %}</label>
+                        <input type="password" class="form-control" name="password" {% if action=='Crear' %}required{%
+                            endif %}>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="is_staff" id="is_staff" {% if
+                            usuario.is_staff %}checked{% endif %}>
+                        <label class="form-check-label" for="is_staff">Es Staff (Acceso Admin)</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="is_superuser" id="is_superuser" {% if
+                            usuario.is_superuser %}checked{% endif %}>
+                        <label class="form-check-label" for="is_superuser">Es Superusuario</label>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button class="btn btn-warning">Guardar</button>
+                    <a href="{% url 'usuario_list' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

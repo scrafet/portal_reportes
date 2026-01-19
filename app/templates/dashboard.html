@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Dashboard Operativo{% endblock %}
+{% block breadcrumb %}Reportes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Filters Card -->
+    <div class="col-md-12">
+        <div class="card card-primary card-outline collapsed-card" id="filters-card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-filter"></i> Filtros de Reporte</h3>
+                <div class="card-tools">
+                    <button type="button" class="btn btn-tool" data-bs-toggle="collapse" data-bs-target="#filters-body"
+                        aria-expanded="false" aria-controls="filters-body">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="collapse show" id="filters-body">
+                <div class="card-body">
+                    <form id="dynamic-filter-form">
+                        {% csrf_token %}
+                        <!-- JS creates fields here -->
+                        <div class="text-center p-3" id="filters-loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Cargando parámetros...</p>
+                        </div>
+                        <div id="filters-container" class="row"></div>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <button type="button" class="btn btn-secondary" id="btn-reset">Limpiar</button>
+                    <button type="submit" class="btn btn-primary" form="dynamic-filter-form" id="btn-apply">Aplicar
+                        Filtros</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Data Table Card -->
+    <div class="col-md-12">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title">Resultados</h3>
+            </div>
+            <div class="card-body">
+                <table id="report-table" class="table table-bordered table-striped w-100 table-dark">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Server side load -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

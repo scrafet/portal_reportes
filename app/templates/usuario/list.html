@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Gestión de Usuarios{% endblock %}
+{% block breadcrumb %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-warning">
+    <div class="card-header">
+        <h3 class="card-title">Listado de Usuarios</h3>
+        <div class="card-tools">
+            <a href="{% url 'usuario_create' %}" class="btn btn-sm btn-warning">
+                <i class="fas fa-plus"></i> Nuevo Usuario
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Staff</th>
+                    <th>Superuser</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.username }}</td>
+                    <td>{{ u.email }}</td>
+                    <td><i
+                            class="fas {% if u.is_staff %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+                    </td>
+                    <td><i
+                            class="fas {% if u.is_superuser %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
+                    </td>
+                    <td>
+                        <a href="{% url 'usuario_update' pk=u.pk %}" class="btn btn-sm btn-info"><i
+                                class="fas fa-edit"></i></a>
+                        <form action="{% url 'usuario_delete' pk=u.pk %}" method="POST" class="d-inline"
+                            onsubmit="return confirm('¿Eliminar?');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Wizard - Selección SP{% endblock %}
+{% block breadcrumb %}Nuevo Reporte (Paso 2: Selección){% endblock %}
+
+{% block content %}
+<div class="card card-primary card-outline">
+    <div class="card-header">
+        <h3 class="card-title">Stored Procedures Disponibles</h3>
+        <div class="card-tools">
+            <a href="{% url 'reporte_wizard_connection' %}" class="btn btn-sm btn-default">
+                <i class="fas fa-arrow-left"></i> Volver a Conexión
+            </a>
+        </div>
+    </div>
+    <div class="card-body">
+
+        {% if error_msg %}
+        <div class="alert alert-danger">
+            <h5><i class="icon fas fa-ban"></i> Error de Conexión!</h5>
+            {{ error_msg }}
+        </div>
+        <p>Por favor, revise sus credenciales.</p>
+        {% else %}
+        <div class="alert alert-success">
+            Conexión exitosa. Seleccione un SP para crear el reporte.
+        </div>
+
+        <table id="sp-table" class="table table-bordered table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Schema</th>
+                    <th>Nombre SP</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sp in sp_list %}
+                <tr>
+                    <td>{{ sp.schema }}</td>
+                    <td>{{ sp.name }}</td>
+                    <td class="text-center">
+                        <a href="{% url 'reporte_create' %}?sp={{ sp.name }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-check"></i> Seleccionar
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        $('#sp-table').DataTable({
+            "responsive": true,
+            "lengthChange": false,
+            "autoWidth": false,
+            "buttons": ["copy", "csv", "excel", "pdf", "print"]
+        }).buttons().container().appendTo('#sp-table_wrapper .col-md-6:eq(0)');
+    });
+</script>
+{% endblock %}

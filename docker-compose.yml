@@ -10,12 +10,44 @@ services:
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - ./app:/app
+    command: python app/manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - ./app:/app
     ports:
       - "8000:8000"
     env_file:
       - .env # <--- Django también las leerá
     depends_on:
-      - db
+      db:
+        condition: service_started
+      sqlserver:
+        condition: service_started
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: sqlserver
+    user: root
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
+      - MSSQL_PID=${MSSQL_PID}
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./DB:/var/opt/mssql/scripts
+    healthcheck:
+      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P '${MSSQL_SA_PASSWORD}' -Q 'SELECT 1' || exit 1" ]
+      interval: 10s
+      retries: 10
+      start_period: 30s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    user: root
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./DB:/var/opt/mssql/scripts
+    command: >
+      /bin/bash -c " echo 'Waiting for SQL Server to be ready...' sleep 10 echo 'Running SIGH.sql...' /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${MSSQL_SA_PASSWORD} -i /var/opt/mssql/scripts/SIGH.sql echo 'Database initialized.' "

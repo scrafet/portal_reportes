@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Wizard - Conexión DB{% endblock %}
+{% block breadcrumb %}Nuevo Reporte (Paso 1: Conexión){% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card card-primary card-outline">
+            <div class="card-header">
+                <h3 class="card-title text-center w-100">
+                    <i class="fas fa-database mb-2" style="font-size: 2rem;"></i><br>
+                    Credenciales de Base de Datos
+                </h3>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> Ingrese las credenciales para descubrir los Stored Procedures
+                        disponibles.
+                    </div>
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                    {% endfor %}
+                    {% endif %}
+
+                    <div class="form-group mb-3">
+                        <label>Host / IP</label>
+                        <input type="text" class="form-control" name="host" placeholder="localhost" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Base de Datos</label>
+                        <input type="text" class="form-control" name="database" placeholder="SIGH_EXTERNA" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Usuario SQL</label>
+                        <input type="text" class="form-control" name="user" placeholder="sa" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Contraseña</label>
+                        <input type="password" class="form-control" name="password" required>
+                    </div>
+                </div>
+                <div class="card-footer text-right">
+                    <button type="submit" class="btn btn-primary">
+                        Siguiente <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

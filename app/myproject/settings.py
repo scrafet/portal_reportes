@@ -17,20 +17,19 @@ import os
 # Cargar variables desde el archivo .env
 load_dotenv()
 
+# Fallback: If psycopg2 is not installed, disable Postgres config to ensure local run works with SQLite
+try:
+    import psycopg2
+except ImportError:
+    if os.environ.get('DB_NAME'):
+        print("Warning: psycopg2 not found. Falling back to SQLite.")
+        os.environ.pop('DB_NAME', None)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Ahora reemplaza los valores fijos por os.environ.get()
-SECRET_KEY = os.environ.get('SECRET_KEY', 'clave-por-defecto-si-no-hay-env')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-l-_$jddbaw&3c57^7#*089_xo)6)620vf2dc30sm@mob@3x9db'
-
-# SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-l-_$jddbaw&3c57^7#*089_xo)6)620vf2dc30sm@mob@3x9db')
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
@@ -57,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'core.middleware.SingleSessionMiddleware', # Commented out for local test safety
+    # 'core.middleware.AutoLogoutMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -83,16 +84,35 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST'),
-        'PORT': os.environ.get('DB_PORT'),
+if os.environ.get('DB_NAME'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DB_NAME'),
+            'USER': os.environ.get('DB_USER'),
+            'PASSWORD': os.environ.get('DB_PASSWORD'),
+            'HOST': os.environ.get('DB_HOST'),
+            'PORT': os.environ.get('DB_PORT'),
+        },
+        'mssql': {
+            'ENGINE': 'mssql',
+            'NAME': os.environ.get('MSSQL_NAME', 'SIGH_EXTERNA'),
+            'USER': os.environ.get('MSSQL_USER', 'sa'),
+            'PASSWORD': os.environ.get('MSSQL_PASSWORD', 'password'),
+            'HOST': os.environ.get('MSSQL_HOST', 'localhost'),
+            'PORT': os.environ.get('MSSQL_PORT', '1433'),
+            'OPTIONS': {
+                'driver': 'ODBC Driver 17 for SQL Server',
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
@@ -130,6 +150,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -145,6 +168,11 @@ JAZZMIN_SETTINGS = {
     "search_model": ["auth.User"],
     "show_ui_builder": True,  # <--- ESTO ES MAGIA: Te permite cambiar colores en vivo
 }
+
+# Session Settings
+SESSION_COOKIE_AGE = 3 * 60  # 3 minutes in seconds
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_SAVE_EVERY_REQUEST = True # Updates session expiry on every request
 
 JAZZMIN_UI_TWEAKS = {
     "theme": "darkly", # Hay muchos: flatly, slate, lumen, etc.
