@@ -8,10 +8,18 @@ Este proyecto implementa un portal de reportes moderno utilizando **Django 5**, 
 *   **Frontend**: Bootstrap 5 (Dark Mode), DataTables.net (Server-side, Export Buttons), jQuery.
 *   **Estilo Visual**: Replicación fiel de AdminLTE 3 Dark Mode con CSS personalizado.
 *   **Funcionalidades**:
-    *   Dashboard interactivo con filtros dinámicos (Date, Select, Input) generados vía JS.
-    *   Sidebar dinámico basado en categorías.
-    *   Integración con SQL Server para datos externos.
-    *   Middleware de sesión y auditoría (planificado).
+    *   **Dashboard Interactivo**: Visualización de datos con filtros dinámicos.
+    *   **Asistente de Creación de Reportes (Wizard)**:
+        *   Conexión a bases de datos SQL Server externas.
+        *   Descubrimiento automático de Stored Procedures.
+        *   Configuración guiada paso a paso.
+    *   **Gestión Integral (CRUD)**:
+        *   Categorías: Organización dinámica del menú lateral.
+        *   Reportes: Administración de metadatos de reportes.
+        *   Usuarios: Gestión de acceso y perfiles.
+    *   **Ejecución y Auditoría**:
+        *   Ejecución de SPs con parámetros dinámicos.
+        *   Registro de auditoría de todas las consultas realizadas (`ConsultaAuditoria`).
 
 ## 📋 Requisitos Previos
 
