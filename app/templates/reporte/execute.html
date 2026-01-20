@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ reporte.nombre }}{% endblock %}
+
+{% block content %}
+<div class="card card-primary card-outline">
+    {% if locked %}
+    <div class="overlay dark" style="z-index: 50;">
+        <div class="text-center">
+            <i class="fas fa-3x fa-lock mb-3"></i>
+            <h4 class="text-bold">Acceso Restringido por Horario</h4>
+            <p>Disponible de {{ reporte.horario_inicio|time:"H:i" }} a {{ reporte.horario_fin|time:"H:i" }}</p>
+        </div>
+    </div>
+    {% endif %}
+    <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-filter"></i> Filtros</h3>
+    </div>
+    <div class="card-body">
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="row">
+                {% for param in reporte.configuracion_parametros %}
+                <div class="col-md-3 mb-3">
+                    <label>{{ param.label|default:param.nombre }}</label>
+                    {% if 'date' in param.tipo|lower %}
+                    <input type="date" class="form-control" name="{{ param.nombre }}">
+                    {% elif 'int' in param.tipo|lower or 'numeric' in param.tipo|lower or 'decimal' in param.tipo|lower
+                    %}
+                    <input type="number" class="form-control" name="{{ param.nombre }}" step="any">
+                    {% else %}
+                    <input type="text" class="form-control" name="{{ param.nombre }}">
+                    {% endif %}
+                </div>
+                {% empty %}
+                <div class="col-12 text-muted mb-3">Este reporte no requiere parámetros. Pulse Generar.</div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-play"></i> Generar</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table id="report-table" class="table table-bordered table-striped w-100">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    var dataTableInstance = null;
+
+    $('#filter-form').on('submit', function (e) {
+        e.preventDefault();
+
+        var btn = $(this).find('button[type="submit"]');
+        var originalText = btn.html();
+        btn.html('<i class="fas fa-spinner fa-spin"></i> Cargando...').prop('disabled', true);
+
+        $.ajax({
+            url: "{% url 'reporte_execute' reporte.id %}",
+            method: "POST",
+            data: $(this).serialize(),
+            success: function (response) {
+                if (response.success) {
+                    initTable(response.data, response.columns);
+                } else {
+                    alert("Error: " + response.error);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("Error de comunicación: " + error);
+            },
+            complete: function () {
+                btn.html(originalText).prop('disabled', false);
+            }
+        });
+    });
+
+    function initTable(data, columns) {
+        if (dataTableInstance) {
+            dataTableInstance.destroy();
+            $('#report-table').empty();
+        }
+
+        if (columns.length === 0) {
+            $('#report-table').html('<tbody><tr><td class="text-center">No hay datos</td></tr></tbody>');
+            return;
+        }
+
+        var dtColumns = columns.map(function (c) {
+            return { title: c, data: c, defaultContent: "" };
+        });
+
+        dataTableInstance = $('#report-table').DataTable({
+            data: data,
+            columns: dtColumns,
+            responsive: true,
+            lengthChange: true,
+            autoWidth: false,
+            ordering: false, // Performance for large reports
+            buttons: ["copy", "csv", "excel", "pdf", "print"],
+            language: {
+                "url": "//cdn.datatables.net/plug-ins/1.10.21/i18n/Spanish.json"
+            }
+        });
+
+        dataTableInstance.buttons().container().appendTo('#report-table_wrapper .col-md-6:eq(0)');
+    }
+</script>
+{% endblock %}

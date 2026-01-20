@@ -36,6 +36,8 @@
                             class="fas {% if u.is_superuser %}fa-check text-success{% else %}fa-times text-danger{% endif %}"></i>
                     </td>
                     <td>
+                        <a href="{% url 'usuario_asignar' pk=u.pk %}" class="btn btn-sm btn-primary"
+                            title="Asignar Permisos"><i class="fas fa-cogs"></i></a>
                         <a href="{% url 'usuario_update' pk=u.pk %}" class="btn btn-sm btn-info"><i
                                 class="fas fa-edit"></i></a>
                         <form action="{% url 'usuario_delete' pk=u.pk %}" method="POST" class="d-inline"

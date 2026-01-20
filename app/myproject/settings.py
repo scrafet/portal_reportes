@@ -56,8 +56,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'core.middleware.SingleSessionMiddleware', # Commented out for local test safety
-    # 'core.middleware.AutoLogoutMiddleware',
+    'core.middleware.OneSessionPerUserMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'

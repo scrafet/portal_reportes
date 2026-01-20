@@ -27,7 +27,7 @@ def decrypt_password(encrypted_password):
         print(f"Error decrypting password: {e}")
         return None
 
-def get_raw_connection(server_host, database, user, password):
+def get_raw_connection(server_host, database, user, password, timeout=30):
     """
     Establishes a raw pyodbc connection to MSSQL.
     Tries to find a suitable driver.
@@ -53,7 +53,8 @@ def get_raw_connection(server_host, database, user, password):
         raise Exception("No ODBC driver found for SQL Server.")
 
     # Construct connection string
-    # TrustServerCertificate=yes is often needed for dev/docker self-signed certs
+    # TrustServerCertificate=yes is usually required for Docker/Self-signed environments
+    # Encrypt=no allows unencrypted connections if server permits (or encrypted if server requires), avoiding strict client-side enforcement
     conn_str = (
         f"DRIVER={{{driver_name}}};"
         f"SERVER={server_host};"
@@ -61,11 +62,11 @@ def get_raw_connection(server_host, database, user, password):
         f"UID={user};"
         f"PWD={password};"
         "TrustServerCertificate=yes;"
-        "Encrypt=Optional;" # Start with Optional to avoid strict SSL errors in dev
+        "Encrypt=no;"  
     )
     
     try:
-        conn = pyodbc.connect(conn_str)
+        conn = pyodbc.connect(conn_str, timeout=timeout)
         return conn
     except pyodbc.Error as e:
         # Fallback or clean error

@@ -15,30 +15,87 @@
                 <div class="card-body">
                     <div class="form-group mb-3">
                         <label for="nombre">Nombre</label>
-                        <input type="text" class="form-control" id="nombre" name="nombre" value="{{ reporte.nombre|default:'' }}" required>
+                        <input type="text" class="form-control" id="nombre" name="nombre"
+                            value="{{ reporte.nombre|default:initial_sp|default:'' }}" required>
                     </div>
-                    
+
                     <div class="form-group mb-3">
                         <label for="descripcion">Descripción</label>
-                        <textarea class="form-control" id="descripcion" name="descripcion" rows="3">{{ reporte.descripcion|default:'' }}</textarea>
+                        <textarea class="form-control" id="descripcion" name="descripcion"
+                            rows="3">{{ reporte.descripcion|default:'' }}</textarea>
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="categoria">Categoría</label>
                         <select class="form-control" id="categoria" name="categoria" required>
                             {% for cat in categorias %}
-                            <option value="{{ cat.id }}" {% if reporte.categoria_id == cat.id %}selected{% endif %}>{{ cat.nombre }}</option>
+                            <option value="{{ cat.id }}" {% if reporte.categoria_id==cat.id %}selected{% endif %}>{{
+                                cat.nombre }}</option>
                             {% endfor %}
                         </select>
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="sp_nombre">Nombre Stored Procedure</label>
-                        <input type="text" class="form-control" id="sp_nombre" name="sp_nombre" value="{{ reporte.sp_nombre|default:'' }}" required>
+                        <input type="text" class="form-control" id="sp_nombre" name="sp_nombre"
+                            value="{{ reporte.sp_nombre|default:initial_sp|default:'' }}" required>
+                    </div>
+
+                    {% if parametros_sp %}
+                    <div class="form-group mb-3">
+                        <label>Configuración de Parámetros</label>
+                        <div class="alert alert-info py-2 small">
+                            <i class="fas fa-info-circle"></i> Seleccione los parámetros que se solicitarán al usuario.
+                        </div>
+                        <table id="params-table" class="table table-bordered table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 50px">Sel.</th>
+                                    <th>Parámetro</th>
+                                    <th>Tipo</th>
+                                    <th>Longitud</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in parametros_sp %}
+                                <tr>
+                                    <td class="text-center">
+                                        <input type="checkbox" name="parametros_seleccionados" value="{{ p.nombre }}"
+                                            checked>
+                                        <input type="hidden" name="param_meta_{{ p.nombre }}"
+                                            value="{{ p.tipo }}|{{ p.longitud }}">
+                                    </td>
+                                    <td>{{ p.nombre }}</td>
+                                    <td>{{ p.tipo }}</td>
+                                    <td>{{ p.longitud }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% endif %}
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group mb-3">
+                                <label for="horario_inicio">Hora Inicio Acceso</label>
+                                <input type="time" class="form-control" id="horario_inicio" name="horario_inicio"
+                                    value="{{ reporte.horario_inicio|time:'H:i'|default:'' }}">
+                                <small class="text-muted">Deje vacío para acceso 24/7</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="form-group mb-3">
+                                <label for="horario_fin">Hora Fin Acceso</label>
+                                <input type="time" class="form-control" id="horario_fin" name="horario_fin"
+                                    value="{{ reporte.horario_fin|time:'H:i'|default:'' }}">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="form-check mb-3">
-                        <input type="checkbox" class="form-check-input" id="activo" name="activo" {% if not reporte or reporte.activo %}checked{% endif %}>
+                        <input type="checkbox" class="form-check-input" id="activo" name="activo" {% if not reporte or
+                            reporte.activo %}checked{% endif %}>
                         <label class="form-check-label" for="activo">Activo</label>
                     </div>
                 </div>
@@ -51,4 +108,22 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function () {
+        if ($('#params-table').length) {
+            $('#params-table').DataTable({
+                "paging": false,
+                "lengthChange": false,
+                "searching": false,
+                "ordering": false,
+                "info": false,
+                "autoWidth": false,
+                "responsive": true
+            });
+        }
+    });
+</script>
 {% endblock %}

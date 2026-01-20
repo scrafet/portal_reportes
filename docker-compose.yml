@@ -5,6 +5,10 @@ services:
       - ./db_data:/var/lib/postgresql/data
     env_file:
       - .env # <--- Docker leerá las credenciales de aquí
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
     ports:
       - "5432:5432"
 
@@ -36,18 +40,17 @@ services:
     volumes:
       - ./DB:/var/opt/mssql/scripts
     healthcheck:
-      test: [ "CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P '${MSSQL_SA_PASSWORD}' -Q 'SELECT 1' || exit 1" ]
+      test: [ "CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1" ]
       interval: 10s
       retries: 10
-      start_period: 30s
+      start_period: 45s
 
   db-init:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    user: root
+    build: ./DB
     depends_on:
       sqlserver:
         condition: service_healthy
-    volumes:
-      - ./DB:/var/opt/mssql/scripts
+    env_file:
+      - .env
     command: >
-      /bin/bash -c " echo 'Waiting for SQL Server to be ready...' sleep 10 echo 'Running SIGH.sql...' /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P ${MSSQL_SA_PASSWORD} -i /var/opt/mssql/scripts/SIGH.sql echo 'Database initialized.' "
+      /bin/bash -c " echo 'Waiting for SQL Server to be ready...'; sleep 15; echo 'Initializing Databases...'; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P $MSSQL_SA_PASSWORD -C -i /var/opt/mssql/scripts/00_init_databases.sql; echo 'Running SIGH.sql...'; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P $MSSQL_SA_PASSWORD -C -i /var/opt/mssql/scripts/SIGH.sql; echo 'Running SIGH_EXTERNA.sql...'; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P $MSSQL_SA_PASSWORD -C -i /var/opt/mssql/scripts/SIGH_EXTERNA.sql; echo 'Running SIGH_SIS.sql...'; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P $MSSQL_SA_PASSWORD -C -i /var/opt/mssql/scripts/SIGH_SIS.sql; echo 'Running BDHIS_MINSA.sql...'; /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P $MSSQL_SA_PASSWORD -C -i /var/opt/mssql/scripts/BDHIS_MINSA.sql; echo 'Database initialization completed.'; "

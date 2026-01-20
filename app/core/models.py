@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class MSSQLServer(models.Model):
     nombre = models.CharField(max_length=100, help_text="Nombre identificador del servidor")
@@ -15,6 +16,7 @@ class CategoriaReporte(models.Model):
     icono = models.CharField(max_length=50, default="fas fa-folder", help_text="Clase FontAwesome, ej: fas fa-chart-line")
     orden = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
+    usuarios = models.ManyToManyField(User, blank=True, related_name='categorias_permitidas', help_text="Usuarios con acceso a esta categoría")
 
     class Meta:
         ordering = ['orden', 'nombre']
@@ -27,11 +29,21 @@ class Reporte(models.Model):
     descripcion = models.TextField(blank=True, null=True)
     categoria = models.ForeignKey(CategoriaReporte, on_delete=models.CASCADE, related_name='reportes')
     sp_nombre = models.CharField(max_length=100, help_text="Nombre del Stored Procedure en SQL Server")
+    configuracion_parametros = models.JSONField(blank=True, null=True, help_text="Configuración de parámetros seleccionados")
     activo = models.BooleanField(default=True)
+    usuarios = models.ManyToManyField(User, blank=True, related_name='reportes_permitidos', help_text="Usuarios con acceso a este reporte")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nombre
+
+class UserSession(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='logged_in_user')
+    session_key = models.CharField(max_length=40, null=True, blank=True)
+    last_login_ip = models.GenericIPAddressField(null=True, blank=True)
+
+    def __str__(self):
+        return self.user.username
 
 class ConsultaAuditoria(models.Model):
     usuario = models.CharField(max_length=150)

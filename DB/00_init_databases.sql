@@ -1,0 +1,20 @@
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'sigh')
+BEGIN
+    CREATE DATABASE [sigh];
+END
+GO
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'SIGH_EXTERNA')
+BEGIN
+    CREATE DATABASE [SIGH_EXTERNA];
+END
+GO
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'sigh_sis')
+BEGIN
+    CREATE DATABASE [sigh_sis];
+END
+GO
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'BDHIS_MINSA')
+BEGIN
+    CREATE DATABASE [BDHIS_MINSA];
+END
+GO

@@ -4,3 +4,4 @@ python-dotenv==1.0.0
 django-jazzmin==2.6.0
 cryptography>=41.0.0
 pyodbc>=5.0.0
+ldap3

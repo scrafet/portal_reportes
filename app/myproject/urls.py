@@ -4,14 +4,16 @@ from core.views import (
     home, ReporteExecutorView, 
     reporte_list, reporte_create, reporte_update, reporte_delete,
     categoria_list, categoria_create, categoria_update, categoria_delete,
-    usuario_list, usuario_create, usuario_update, usuario_delete,
-    reporte_wizard_connection, reporte_wizard_discovery
+    usuario_list, usuario_create, usuario_update, usuario_delete, usuario_asignar, usuario_ad_sync,
+    reporte_wizard_connection, reporte_wizard_discovery,
+    reporte_execute
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('reporte-executor/', ReporteExecutorView.as_view(), name='reporte_executor'),
+    path('reportes/ejecutar/<int:pk>/', reporte_execute, name='reporte_execute'),
     
     # Reportes
     path('reportes/', reporte_list, name='reporte_list'),
@@ -34,4 +36,6 @@ urlpatterns = [
     path('usuarios/nuevo/', usuario_create, name='usuario_create'),
     path('usuarios/editar/<int:pk>/', usuario_update, name='usuario_update'),
     path('usuarios/eliminar/<int:pk>/', usuario_delete, name='usuario_delete'),
+    path('usuarios/asignar/<int:pk>/', usuario_asignar, name='usuario_asignar'),
+    path('usuarios/sync-ad/', usuario_ad_sync, name='usuario_ad_sync'),
 ]

@@ -37,12 +37,24 @@
                 {% for categoria in sidebar_categories %}
                 <li class="nav-item">
                     <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-folder"></i>
+                        <i class="nav-icon {{ categoria.icono }}"></i>
                         <p>
                             {{ categoria.nombre }}
                             <i class="fas fa-angle-left right"></i>
                         </p>
                     </a>
+                    <ul class="nav nav-treeview">
+                        {% for reporte in categoria.reportes.all %}
+                        {% if reporte.activo %}
+                        <li class="nav-item">
+                            <a href="{% url 'reporte_execute' reporte.id %}" class="nav-link">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>{{ reporte.nombre }}</p>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
                 </li>
                 {% empty %}
                 <li class="nav-item">

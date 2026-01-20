@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Asignar Permisos a {{ usuario.username }}{% endblock %}
+{% block breadcrumb %}Asignar Permisos{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    <div class="row">
+        <!-- Categories -->
+        <div class="col-md-6">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Categorías (Menús)</h3>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="checkAllCat">
+                            <label for="checkAllCat" class="custom-control-label">Seleccionar Todo</label>
+                        </div>
+                    </div>
+                    <hr>
+                    {% for cat in categorias %}
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input class="custom-control-input cat-check" type="checkbox" name="categorias"
+                            value="{{ cat.id }}" id="cat_{{ cat.id }}" {% if cat in asignados_categorias %}checked{%
+                            endif %}>
+                        <label class="custom-control-label" for="cat_{{ cat.id }}">
+                            <i class="{{ cat.icono }} mr-1"></i> {{ cat.nombre }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports -->
+        <div class="col-md-6">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Reportes Específicos</h3>
+                </div>
+                <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input" type="checkbox" id="checkAllRep">
+                            <label for="checkAllRep" class="custom-control-label">Seleccionar Todo</label>
+                        </div>
+                    </div>
+                    <hr>
+                    {% for rep in reportes %}
+                    <div class="custom-control custom-checkbox mb-2">
+                        <input class="custom-control-input rep-check" type="checkbox" name="reportes"
+                            value="{{ rep.id }}" id="rep_{{ rep.id }}" {% if rep in asignados_reportes %}checked{% endif
+                            %}>
+                        <label class="custom-control-label" for="rep_{{ rep.id }}">
+                            {{ rep.nombre }} <small class="text-muted">({{ rep.categoria.nombre }})</small>
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row pb-4">
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar Asignaciones</button>
+            <a href="{% url 'usuario_list' %}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </div>
+</form>
+
+{% block extra_scripts %}
+<script>
+    document.getElementById('checkAllCat').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('.cat-check');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+    document.getElementById('checkAllRep').addEventListener('change', function () {
+        var checkboxes = document.querySelectorAll('.rep-check');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}
